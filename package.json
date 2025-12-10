@@ -1,0 +1,30 @@
+{
+  "name": "homebridge-slide-local",
+  "version": "0.0.1",
+  "description": "Homebridge plugin for Slide smart curtains using the local API only.",
+  "main": "index.js",
+  "license": "MIT",
+  "author": "Christian + contributors",
+  "keywords": [
+    "homebridge-plugin",
+    "homebridge-platform-plugin",
+    "slide",
+    "curtain",
+    "window-covering"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "homebridge": ">=1.6.0"
+  },
+  "peerDependencies": {
+    "homebridge": ">=1.6.0"
+  },
+  "homepage": "https://github.com/krillle/homebridge-slide-local",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/krillle/homebridge-slide-local.git"
+  },
+  "bugs": {
+    "url": "https://github.com/krillle/homebridge-slide-local/issues"
+  }
+}
