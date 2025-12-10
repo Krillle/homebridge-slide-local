@@ -59,6 +59,14 @@
               "default": 5000,
               "minimum": 1000,
               "description": "Timeout for HTTP requests to this Slide."
+            },
+            "tolerance": {
+              "title": "Tolerance (%)",
+              "type": "number",
+              "default": 5,
+              "minimum": 0,
+              "maximum": 20,
+              "description": "Allowed deviation before HomeKit considers the target position reached."
             }
           },
           "required": ["name", "host"]

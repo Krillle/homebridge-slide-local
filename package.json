@@ -1,7 +1,7 @@
 {
   "name": "homebridge-slide-local",
-  "version": "0.0.1",
-  "description": "Homebridge plugin for Slide smart curtains using the local API only.",
+  "version": "0.0.2",
+  "description": "Homebridge plugin for Slide smart curtains using the local API (with optional HTTP Digest auth for API v1).",
   "main": "index.js",
   "license": "MIT",
   "author": "Christian + contributors",

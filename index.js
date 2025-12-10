@@ -80,6 +80,8 @@ class SlideAccessory {
     this.config = config;
     this.name = config.name;
     this.host = config.host;
+    const toleranceFromConfig = typeof config.tolerance === 'number' ? config.tolerance : 5;
+    this.tolerance = Math.max(0, toleranceFromConfig);
 
     const timeout = config.timeout || 5000;
     const username = config.username || 'user';
@@ -150,13 +152,24 @@ class SlideAccessory {
       }
 
       const currentPercent = this.slidePosToPercent(info.pos);
+      const targetCharacteristic = this.service.getCharacteristic(Characteristic.TargetPosition);
+      const rawTarget = targetCharacteristic.value;
+      const targetPercent =
+        typeof rawTarget === 'number' && !Number.isNaN(rawTarget) ? rawTarget : currentPercent;
+      const diff = Math.abs(currentPercent - targetPercent);
 
       this.service.updateCharacteristic(Characteristic.CurrentPosition, currentPercent);
-      this.service.updateCharacteristic(Characteristic.TargetPosition, currentPercent);
-      this.service.updateCharacteristic(
-        Characteristic.PositionState,
-        Characteristic.PositionState.STOPPED,
-      );
+      this.service.updateCharacteristic(Characteristic.TargetPosition, targetPercent);
+
+      if (diff <= this.tolerance) {
+        this.log.debug(
+          `Position within tolerance for ${this.name}: target=${targetPercent}%, current=${currentPercent}% (diff=${diff}%)`,
+        );
+        this.service.updateCharacteristic(
+          Characteristic.PositionState,
+          Characteristic.PositionState.STOPPED,
+        );
+      }
     } catch (err) {
       this.log.debug(`Failed to update Slide info for ${this.name}: ${err.message}`);
     }
@@ -186,6 +199,8 @@ class SlideAccessory {
     const percent = Number(value);
     const slidePos = this.percentToSlidePos(percent);
 
+    this.service.updateCharacteristic(Characteristic.TargetPosition, percent);
+
     this.log.info(
       `Setting target position for ${this.name} to ${percent}% (slide pos=${slidePos.toFixed(
         2,
@@ -206,8 +221,10 @@ class SlideAccessory {
     try {
       await this.client.setPosition(slidePos);
       setTimeout(() => {
-        this.updateFromDevice();
-      }, 3000);
+        this.updateFromDevice().catch((err) => {
+          this.log.debug(`Poll error for ${this.name}: ${err.message}`);
+        });
+      }, 2000);
     } catch (err) {
       this.log.warn(`Error setting target position for ${this.name}: ${err.message}`);
       this.service.updateCharacteristic(
